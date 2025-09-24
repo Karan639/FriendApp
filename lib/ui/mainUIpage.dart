@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:simpleapp/blocs/authBloc/auth_bloc.dart';
+import 'package:simpleapp/blocs/authBloc/auth_bloc_events.dart';
+import 'package:simpleapp/blocs/authBloc/auth_bloc_states.dart';
 import 'package:simpleapp/ui/dashboard/dashboard.dart';
 import 'package:simpleapp/ui/query/query_page.dart';
 import 'package:simpleapp/ui/settings/settings.dart';
@@ -12,16 +16,16 @@ class Mainpage extends StatefulWidget{
 class _MainPageState extends State<Mainpage>{
   int currentIndex = 1;
   final List<Widget> pages =[
+    DashboardPage(),
     QueryPage(),
-    Dashboard(),
-    Settings()
+    SettingsPage()
   ];
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Solar Energy App'),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.green,
         actions: [
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
@@ -66,14 +70,14 @@ class _MainPageState extends State<Mainpage>{
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
             child: GNav(
-              rippleColor: Colors.orange.shade300,
-              hoverColor: Colors.orange.shade100,
+              rippleColor: Colors.green.shade300,
+              hoverColor: Colors.green.shade100,
               gap: 8,
-              activeColor: Colors.orange,
+              activeColor: Colors.green,
               iconSize: 24,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               duration: Duration(milliseconds: 400),
-              tabBackgroundColor: Colors.orange.shade100,
+              tabBackgroundColor: Colors.green.shade100,
               color: Colors.black,
               tabs: [
                 GButton(icon: Icons.dashboard, text: 'Dashboard'),
