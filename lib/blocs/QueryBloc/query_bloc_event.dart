@@ -6,11 +6,17 @@ abstract class QueryBlocEvent extends Equatable {
 }
 
 class SubmitQuery extends QueryBlocEvent {
-  final String category;
-  final String title;
+  final String subject;
   final String description;
   
-  SubmitQuery(this.category, this.title, this.description);
+  SubmitQuery(this.subject, this.description);
   @override
-  List<Object> get props => [category, title, description];
+  List<Object> get props => [subject, description];
+}
+
+class LoadQueries extends QueryBlocEvent {
+  final String status;
+  LoadQueries({this.status = 'OPEN'});
+  @override
+  List<Object> get props => [status];
 }

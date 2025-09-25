@@ -5,13 +5,16 @@ abstract class AuthBlocEvents extends Equatable {
   List<Object> get props => [];
 }
 
+class CheckAuthStatus extends AuthBlocEvents {} // New event for checking stored auth
+
+
 class LoginWithCredentials extends AuthBlocEvents {
-  final String email;
+  final String username;
   final String password;
-  LoginWithCredentials(this.email, this.password);
+  LoginWithCredentials(this.username, this.password);
 
   @override
-  List<Object> get props => [email, password];
+  List<Object> get props => [username, password];
 }
 
 class LoginWithGoogle extends AuthBlocEvents {}

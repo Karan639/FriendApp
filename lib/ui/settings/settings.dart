@@ -26,15 +26,15 @@ class SettingsPage extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 30,
-                            child: Text(state.user.name[0].toUpperCase()),
+                            child: Text(state.user.username.toUpperCase()),
                           ),
                           SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(state.user.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                Text(state.user.email, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                                Text(state.user.username, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                //Text(state.user.email, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
                               ],
                             ),
                           ),

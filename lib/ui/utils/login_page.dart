@@ -11,7 +11,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
         listener: (context, state) {
           if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
             );
           }
         },
@@ -42,13 +42,13 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     children: [
                       TextFormField(
-                        controller: _emailController,
+                        controller: _usernameController,
                         decoration: InputDecoration(
-                          labelText: 'Email',
-                          prefixIcon: Icon(Icons.email),
+                          labelText: 'Username/Phone',
+                          prefixIcon: Icon(Icons.person),
                           border: OutlineInputBorder(),
                         ),
-                        validator: (value) => value?.contains('@') == true ? null : 'Enter valid email',
+                        validator: (value) => value?.isEmpty == true ? 'Enter username' : null,
                       ),
                       SizedBox(height: 16),
                       TextFormField(
@@ -68,29 +68,15 @@ class _LoginPageState extends State<LoginPage> {
                 
                 BlocBuilder<AuthBloc, AuthState>(
                   builder: (context, state) {
-                    return Column(
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: state is AuthLoading ? null : _handleLogin,
-                            child: state is AuthLoading 
-                              ? CircularProgressIndicator(color: Colors.white)
-                              : Text('Login'),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: OutlinedButton.icon(
-                            onPressed: state is AuthLoading ? null : _handleGoogleLogin,
-                            icon: Icon(Icons.login),
-                            label: Text('Sign in with Google'),
-                          ),
-                        ),
-                      ],
+                    return SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: state is AuthLoading ? null : _handleLogin,
+                        child: state is AuthLoading 
+                          ? CircularProgressIndicator(color: Colors.white)
+                          : Text('Login'),
+                      ),
                     );
                   },
                 ),
@@ -105,12 +91,8 @@ class _LoginPageState extends State<LoginPage> {
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-        LoginWithCredentials(_emailController.text, _passwordController.text),
+        LoginWithCredentials(_usernameController.text, _passwordController.text),
       );
     }
-  }
-
-  void _handleGoogleLogin() {
-    context.read<AuthBloc>().add(LoginWithGoogle());
   }
 }

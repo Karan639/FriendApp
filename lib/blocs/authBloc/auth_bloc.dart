@@ -8,14 +8,29 @@ class AuthBloc extends Bloc<AuthBlocEvents,AuthState> {
 
   AuthBloc(this.apiServices) : super(AuthInitial()){
     on<LoginWithCredentials>(onLoginWithCredentials);
-    on<LoginWithGoogle> (onLoginWithGoogle);
+    on<CheckAuthStatus>(onCheckAuthStatus);
     on<LogoutRequested> (onLogoutRequested);
+  }
+
+    // Check if user is already logged in
+  Future<void> onCheckAuthStatus(CheckAuthStatus event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      final storedUser = await apiServices.getStoredUser();
+      if (storedUser != null && storedUser.isTokenValid) {
+        emit(AuthAuthenticated(storedUser));
+      } else {
+        emit(AuthInitial());
+      }
+    } catch (e) {
+      emit(AuthInitial());
+    }
   }
 
   Future<void> onLoginWithCredentials(LoginWithCredentials event, Emitter<AuthState> emit)async{
     emit(AuthLoading());
     try{
-      final user = await apiServices.loginWithCredentials(event.email, event.password);
+      final user = await apiServices.loginWithCredentials(event.username, event.password);
       emit(AuthAuthenticated( user));
     }
     catch(error){
@@ -23,16 +38,16 @@ class AuthBloc extends Bloc<AuthBlocEvents,AuthState> {
     }
   }
 
-  Future<void> onLoginWithGoogle(LoginWithGoogle event, Emitter<AuthState> emit)async{
-    emit(AuthLoading());
-    try{
-      final user = await apiServices.loginWithGoogle();
-      emit(AuthAuthenticated(user));
-    }
-    catch(e){
-      emit(AuthError(e.toString()));
-    }
-  }
+  // Future<void> onLoginWithGoogle(LoginWithGoogle event, Emitter<AuthState> emit)async{
+  //   emit(AuthLoading());
+  //   try{
+  //     final user = await apiServices.loginWithGoogle();
+  //     emit(AuthAuthenticated(user));
+  //   }
+  //   catch(e){
+  //     emit(AuthError(e.toString()));
+  //   }
+  // }
 
   Future<void> onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit)async{
     emit(AuthLoading());
