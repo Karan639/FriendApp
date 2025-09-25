@@ -18,7 +18,7 @@ class ApiServices {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           if (_authToken != null) {
-            options.headers['Authorization'] = _authToken; // Note: Your API might not need 'Bearer' prefix
+            options.headers['Authorization'] = _authToken;
           }
           handler.next(options);
         },
@@ -85,7 +85,6 @@ class ApiServices {
       String errorMessage = 'Login failed';
       
       if (e.response != null) {
-        // Handle different HTTP status codes
         switch (e.response!.statusCode) {
           case 400:
             errorMessage = 'Invalid username or password';
@@ -189,19 +188,19 @@ class ApiServices {
     }
   }
 
-  // Dashboard API (placeholder - implement when you have the actual endpoint)
+  // Dashboard API - Returns Map that gets converted to EnergyData
   Future<Map<String, dynamic>> getEnergyData() async {
     try {
       // Replace with your actual energy data endpoint when available
       final response = await dio.get('/dashboard/energy-data');
-      return response.data;
+      return response.data as Map<String, dynamic>;
     } catch (e) {
-      // Return dummy data for now
+      // Return dummy data for now (simulate API response structure)
       await Future.delayed(Duration(seconds: 1)); // Simulate network delay
       return {
         'daily_energy_generation': 25.5,
-        'sunrise_time': '06:30',
-        'sunset_time': '18:45',
+        'sunrise_time': '06:30 AM',
+        'sunset_time': '6:45 PM',
         'daily_energy_savings': 15.75,
         'power_generated': 12.3,
         'earnings': 125.50,

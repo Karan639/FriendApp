@@ -11,7 +11,7 @@ class DashboardInitial extends DashboardBlocState{}
 class DashboardLoading extends DashboardBlocState{}
 
 class DashboardLoaded extends DashboardBlocState{
-  final Map<String,dynamic> energyData;
+  final EnergyData energyData;
   DashboardLoaded(this.energyData);
 
   @override

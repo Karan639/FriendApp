@@ -47,16 +47,22 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Solar Energy App',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.green,
+          primarySwatch: Colors.orange,
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
+              backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
+          ),
+          appBarTheme: AppBarTheme(
+            backgroundColor: Colors.orange,
+            foregroundColor: Colors.white,
+            elevation: 0,
           ),
         ),
         home: BlocBuilder<AuthBloc, AuthState>(
@@ -64,7 +70,7 @@ class MyApp extends StatelessWidget {
             if (state is AuthLoading) {
               return SplashPage();
             } else if (state is AuthAuthenticated) {
-              return Mainpage();
+              return MainPage();
             } else {
               return LoginPage();
             }

@@ -11,7 +11,7 @@ class StorageService {
   
   // Save user data
   Future<void> saveUser(User user) async {
-    final userJson = jsonEncode(user.toJSON());
+    final userJson = jsonEncode(user.toJson());
     await _prefs.setString(_userKey, userJson);
   }
   

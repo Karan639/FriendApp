@@ -6,49 +6,56 @@ class User extends Equatable {
   final String token;
   final int expiration;
 
-  const User(
-    {required this.id,
+  const User({
+    required this.id,
     required this.username,
     required this.token,
-    required this.expiration}
-  );
+    required this.expiration,
+  });
 
-  // create from stored JSON
-  factory User.fromJson(Map<String, dynamic> json) {
+  // Add getter for display name
+  String get name => username; // Use username as display name
+  String get email => '$username@solar.com'; // Generate email from username
+
+  factory User.fromLoginResponse(Map<String, dynamic> json, String username) {
     return User(
-        id: json['id'] ?? 0,
-        username: json['username'],
-        token: json['token'],
-        expiration: json['expiration']);
+      id: 0, // Will be updated when we get customer data
+      username: username,
+      token: json['token'],
+      expiration: int.parse(json['expiration']),
+    );
   }
 
-  factory User.fromLoginResponse(Map<String,dynamic> json, String username){
-    return User(id: 0, // will be set when we get customer data
-    username: username, 
-    token: json['token'],
-    expiration: int.parse(json['expiration']));
-  }
-
-  // check if token is still valid
-  bool get isTokenValid{
+  // Check if token is still valid
+  bool get isTokenValid {
     final now = DateTime.now().millisecondsSinceEpoch;
     final tokenExpiry = DateTime.now().millisecondsSinceEpoch + expiration;
     return now < tokenExpiry;
   }
 
-  // convert to JSON for storage
-  Map<String, dynamic> toJSON(){
+  // Convert to JSON for storage
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'username': username,
       'token': token,
       'expiration': expiration,
-      'loginTime': DateTime.now().millisecondsSinceEpoch
+      'loginTime': DateTime.now().millisecondsSinceEpoch,
     };
   }
 
-  // check if stored token is still valid
-  static bool isStoredTokenValid(Map<String, dynamic> json){
+  // Create from stored JSON
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'] ?? 0,
+      username: json['username'],
+      token: json['token'],
+      expiration: json['expiration'],
+    );
+  }
+
+  // Check if stored token is still valid
+  static bool isStoredTokenValid(Map<String, dynamic> json) {
     final loginTime = json['loginTime'] ?? 0;
     final expiration = json['expiration'] ?? 0;
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -56,5 +63,5 @@ class User extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, username, token, expiration];
+  List<Object> get props => [id, username, token, expiration];
 }
