@@ -1,27 +1,30 @@
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:simpleapp/data/storage_services.dart';
 import 'package:simpleapp/models/query.dart';
 import 'package:simpleapp/models/user.dart';
 
 class ApiServices {
-  final Dio _dio;
-  final SharedPreferences _prefs;
+  final Dio dio;
+  final StorageService storageService;
   String? _authToken;
 
-  ApiServices(this._dio, this._prefs) {
-    _dio.options.baseUrl = 'https://your-api-url.com'; // Replace with your actual API URL
-    _dio.options.connectTimeout = Duration(seconds: 30);
+  ApiServices(this.dio, this.storageService) {
+    dio.options.baseUrl = 'https://your-api-url.com'; // Replace with your actual API URL
+    dio.options.connectTimeout = Duration(seconds: 30);
+    dio.options.receiveTimeout = Duration(seconds: 30);
     
     // Add interceptor to automatically add auth token
-    _dio.interceptors.add(
+    dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
           if (_authToken != null) {
-            options.headers['Authorization'] = 'Bearer $_authToken';
+            options.headers['Authorization'] = _authToken; // Note: Your API might not need 'Bearer' prefix
           }
           handler.next(options);
         },
         onError: (error, handler) {
+          print('API Error: ${error.response?.statusCode} - ${error.response?.data}');
+          
           // Handle 401 unauthorized - token expired
           if (error.response?.statusCode == 401) {
             _handleTokenExpired();
@@ -35,25 +38,11 @@ class ApiServices {
     _loadSavedToken();
   }
 
-  // Load saved token from SharedPreferences
+  // Load saved token from storage
   Future<void> _loadSavedToken() async {
-    final userJson = _prefs.getString('user_data');
-    if (userJson != null) {
-      try {
-        final userData = Map<String, dynamic>.from(
-          // You'll need to parse this JSON properly
-          // For now, assuming it's stored as a Map
-        );
-        if (User.isStoredTokenValid(userData)) {
-          final user = User.fromJson(userData);
-          _authToken = user.token;
-        } else {
-          // Token expired, clear stored data
-          await clearStoredUser();
-        }
-      } catch (e) {
-        await clearStoredUser();
-      }
+    final user = await storageService.getStoredUser();
+    if (user != null) {
+      _authToken = user.token;
     }
   }
 
@@ -68,73 +57,72 @@ class ApiServices {
   }
 
   // Handle token expiration
-  void _handleTokenExpired() {
+  void _handleTokenExpired() async {
     clearAuthToken();
-    clearStoredUser();
+    await storageService.clearUser();
   }
 
   // Auth APIs
   Future<User> loginWithCredentials(String username, String password) async {
     try {
-      final response = await _dio.post('/auth/login', data: {
+      final response = await dio.post('/auth/login', data: {
         'username': username,
         'password': password,
       });
       
-      final user = User.fromLoginResponse(response.data, username);
-      setAuthToken(user.token);
-      
-      // Save user data for persistent login
-      await _saveUserData(user);
-      
-      return user;
-    } catch (e) {
-      if (e is DioException) {
-        throw Exception('Login failed: ${e.response?.data['message'] ?? e.message}');
+      if (response.statusCode == 200 && response.data != null) {
+        final user = User.fromLoginResponse(response.data, username);
+        setAuthToken(user.token);
+        
+        // Save user data for persistent login
+        await storageService.saveUser(user);
+        
+        return user;
+      } else {
+        throw Exception('Invalid login response');
       }
+    } on DioException catch (e) {
+      String errorMessage = 'Login failed';
+      
+      if (e.response != null) {
+        // Handle different HTTP status codes
+        switch (e.response!.statusCode) {
+          case 400:
+            errorMessage = 'Invalid username or password';
+            break;
+          case 401:
+            errorMessage = 'Unauthorized. Please check your credentials';
+            break;
+          case 500:
+            errorMessage = 'Server error. Please try again later';
+            break;
+          default:
+            errorMessage = 'Login failed: ${e.response!.statusMessage}';
+        }
+      } else {
+        errorMessage = 'Network error. Please check your connection';
+      }
+      
+      throw Exception(errorMessage);
+    } catch (e) {
       throw Exception('Login failed: ${e.toString()}');
     }
   }
 
   Future<void> logout() async {
     clearAuthToken();
-    await clearStoredUser();
-  }
-
-  // Save user data to SharedPreferences
-  Future<void> _saveUserData(User user) async {
-    await _prefs.setString('user_data', user.toJSON().toString());
-  }
-
-  // Clear stored user data
-  Future<void> clearStoredUser() async {
-    await _prefs.remove('user_data');
+    await storageService.clearUser();
   }
 
   // Get stored user if valid
   Future<User?> getStoredUser() async {
-    final userJson = _prefs.getString('user_data');
-    if (userJson != null) {
-      try {
-        // Parse the stored JSON string back to Map
-        // You might need to use dart:convert for proper JSON handling
-        final userData = Map<String, dynamic>.from({});
-        if (User.isStoredTokenValid(userData)) {
-          final user = User.fromJson(userData);
-          setAuthToken(user.token);
-          return user;
-        }
-      } catch (e) {
-        await clearStoredUser();
-      }
-    }
-    return null;
+    return await storageService.getStoredUser();
   }
 
   // Query APIs
   Future<void> submitQuery(String subject, String description) async {
     try {
-      final response = await _dio.post('/customer/queries', data: {
+      final response = await dio.post('/customer/queries', data: {
         'subject': subject,
         'description': description,
       });
@@ -142,38 +130,74 @@ class ApiServices {
       if (response.statusCode != 201) {
         throw Exception('Failed to submit query');
       }
-    } catch (e) {
-      if (e is DioException) {
-        throw Exception('Submit query failed: ${e.response?.data['message'] ?? e.message}');
+    } on DioException catch (e) {
+      String errorMessage = 'Failed to submit query';
+      
+      if (e.response != null) {
+        switch (e.response!.statusCode) {
+          case 400:
+            errorMessage = 'Invalid query data';
+            break;
+          case 401:
+            errorMessage = 'Please login again';
+            break;
+          case 500:
+            errorMessage = 'Server error. Please try again';
+            break;
+          default:
+            errorMessage = 'Submit query failed: ${e.response!.statusMessage}';
+        }
+      } else {
+        errorMessage = 'Network error. Please check your connection';
       }
-      throw Exception('Submit query failed: ${e.toString()}');
+      
+      throw Exception(errorMessage);
     }
   }
 
   Future<List<Query>> getQueries({String status = 'OPEN'}) async {
     try {
-      final response = await _dio.get('/customer/queries', queryParameters: {
+      final response = await dio.get('/customer/queries', queryParameters: {
         'status': status,
       });
       
-      final List<dynamic> queryList = response.data;
-      return queryList.map((json) => Query.fromJson(json)).toList();
-    } catch (e) {
-      if (e is DioException) {
-        throw Exception('Failed to fetch queries: ${e.response?.data['message'] ?? e.message}');
+      if (response.statusCode == 200 && response.data != null) {
+        final List<dynamic> queryList = response.data;
+        return queryList.map((json) => Query.fromJson(json)).toList();
+      } else {
+        return [];
       }
-      throw Exception('Failed to fetch queries: ${e.toString()}');
+    } on DioException catch (e) {
+      String errorMessage = 'Failed to fetch queries';
+      
+      if (e.response != null) {
+        switch (e.response!.statusCode) {
+          case 401:
+            errorMessage = 'Please login again';
+            break;
+          case 500:
+            errorMessage = 'Server error. Please try again';
+            break;
+          default:
+            errorMessage = 'Fetch queries failed: ${e.response!.statusMessage}';
+        }
+      } else {
+        errorMessage = 'Network error. Please check your connection';
+      }
+      
+      throw Exception(errorMessage);
     }
   }
 
-  // Dashboard API (placeholder - you'll need to implement based on your actual endpoint)
+  // Dashboard API (placeholder - implement when you have the actual endpoint)
   Future<Map<String, dynamic>> getEnergyData() async {
     try {
-      // This is a placeholder - replace with your actual energy data endpoint
-      final response = await _dio.get('/dashboard/energy-data');
+      // Replace with your actual energy data endpoint when available
+      final response = await dio.get('/dashboard/energy-data');
       return response.data;
     } catch (e) {
-      // For now, return dummy data
+      // Return dummy data for now
+      await Future.delayed(Duration(seconds: 1)); // Simulate network delay
       return {
         'daily_energy_generation': 25.5,
         'sunrise_time': '06:30',
