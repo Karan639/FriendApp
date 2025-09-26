@@ -11,8 +11,8 @@ import 'package:simpleapp/blocs/dashboardBloc/dashboard_bloc.dart';
 import 'package:simpleapp/data/api_services.dart';
 import 'package:simpleapp/data/storage_services.dart';
 import 'package:simpleapp/ui/mainUIpage.dart';
-import 'package:simpleapp/ui/utils/login_page.dart';
-import 'package:simpleapp/ui/utils/splash_screen.dart';
+import 'package:simpleapp/ui/utilspages/login_page.dart';
+import 'package:simpleapp/ui/utilspages/splash_screen/splash_screen.dart';
 
 final getIt = GetIt.instance;
 
@@ -67,13 +67,14 @@ class MyApp extends StatelessWidget {
         ),
         home: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
-            if (state is AuthLoading) {
-              return SplashPage();
-            } else if (state is AuthAuthenticated) {
-              return MainPage();
-            } else {
-              return LoginPage();
-            }
+            // if (state is AuthLoading) {
+            //   return SplashPage();
+            // } else if (state is AuthAuthenticated) {
+            //   return MainPage();
+            // } else {
+            //   return LoginPage();
+            // }
+            return SplashPage();
           },
         ),
       ),
