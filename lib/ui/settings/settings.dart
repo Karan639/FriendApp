@@ -1,7 +1,13 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:simpleapp/blocs/authBloc/auth_bloc.dart';
+import 'package:simpleapp/blocs/authBloc/auth_bloc_events.dart';
 import 'package:simpleapp/blocs/authBloc/auth_bloc_states.dart';
+import 'package:simpleapp/blocs/dashboardBloc/dashboard_bloc.dart';
+import 'package:simpleapp/blocs/dashboardBloc/dashboard_bloc_event.dart';
+import 'package:simpleapp/ui/settings/components/privacy_policy.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatelessWidget {
   @override
@@ -12,8 +18,8 @@ class SettingsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Settings', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 24),
+            // Text('Settings', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            // SizedBox(height: 24),
             
             // User Profile Section
             BlocBuilder<AuthBloc, AuthState>(
@@ -50,9 +56,14 @@ class SettingsPage extends StatelessWidget {
             
             // App Settings
             _buildSettingsSection('App Settings', [
-              _buildSettingsTile('Notifications', 'Manage notification preferences', Icons.notifications, () => _showComingSoon(context)),
-              _buildSettingsTile('Data Refresh', 'Auto-refresh dashboard data', Icons.refresh, () => _showComingSoon(context)),
+              _buildSettingsTile('Notifications', 'Manage notification preferences', Icons.notifications, () => 
+              AppSettings.openAppSettings(type: AppSettingsType.notification)
+              ),
+              _buildSettingsTile('Data Refresh', 'Auto-refresh dashboard data', Icons.refresh, () => 
+                  context.read<DashboardBloc>().add(LoadEnergyData())),
               _buildSettingsTile('Theme', 'Choose app theme', Icons.palette, () => _showComingSoon(context)),
+              _buildSettingsTile('Logout', 'Logout user from App', Icons.logout, () => 
+                context.read<AuthBloc>().add(LogoutRequested()))
             ]),
             SizedBox(height: 24),
             
@@ -66,9 +77,10 @@ class SettingsPage extends StatelessWidget {
             
             // Support & Info
             _buildSettingsSection('Support & Information', [
-              _buildSettingsTile('Help & Support', 'Get help and support', Icons.help, () => _showComingSoon(context)),
+              _buildSettingsTile('Help & Support', 'Get help and support', Icons.help, () => _openEmailApp(context)),
               _buildSettingsTile('About', 'App version and info', Icons.info, () => _showAboutDialog(context)),
-              _buildSettingsTile('Privacy Policy', 'View privacy policy', Icons.privacy_tip, () => _showComingSoon(context)),
+              _buildSettingsTile('Privacy Policy', 'View privacy policy', Icons.privacy_tip, () => 
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()))),
             ]),
           ],
         ),
@@ -77,20 +89,23 @@ class SettingsPage extends StatelessWidget {
   }
 
   Widget _buildSettingsSection(String title, List<Widget> children) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.orange)),
-        SizedBox(height: 12),
-        Card(child: Column(children: children)),
-      ],
+    return Padding(
+      padding: EdgeInsets.only( bottom: 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.green)),
+          SizedBox(height: 12),
+          Card(child: Column(children: children)),
+        ],
+      ),
     );
   }
 
   Widget _buildSettingsTile(String title, String subtitle, IconData icon, VoidCallback onTap) {
     return ListTile(
-      leading: Icon(icon, color: Colors.orange),
-      title: Text(title),
+      leading: Icon(icon, color: Colors.green),
+      title: Text(title, style: TextStyle(fontWeight: FontWeight.w600),),
       subtitle: Text(subtitle),
       trailing: Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
@@ -99,17 +114,40 @@ class SettingsPage extends StatelessWidget {
 
   void _showComingSoon(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('This feature is coming soon!'), backgroundColor: Colors.orange),
+      SnackBar(content: Text('This feature is coming soon!'), backgroundColor: Colors.green),
     );
   }
 
   void _showAboutDialog(BuildContext context) {
     showAboutDialog(
       context: context,
-      applicationName: 'Solar Energy App',
+      applicationName: 'Oscillation Energy LLP',
       applicationVersion: '1.0.0',
-      applicationIcon: Icon(Icons.wb_sunny, size: 50, color: Colors.orange),
+      applicationIcon: Icon(Icons.wb_sunny, size: 50, color: Colors.green),
       children: [Text('A comprehensive solar energy monitoring and management application.')],
     );
+  }
+
+  Future<void> _openEmailApp(BuildContext context)async{
+    final Uri gmailUri = Uri.parse(
+    "mailto:support@myapp.com?subject=Help%20&%20Support&body=Hello,%20I%20need%20help%20with...",
+  );
+
+  const String gmailPackage = "com.google.android.gm";
+
+    if (await canLaunchUrl(gmailUri)) {
+      await launchUrl(
+        gmailUri,
+        mode: LaunchMode.externalApplication,
+        webViewConfiguration: const WebViewConfiguration(headers: {
+          "android.intent.extra.PACKAGE_NAME": gmailPackage,
+        }),
+      );
+    }else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open email app'), backgroundColor: Colors.green)
+      );
+      debugPrint("Could not open email app");
+    }
   }
 }

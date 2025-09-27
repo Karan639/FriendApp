@@ -26,17 +26,24 @@ class _LoginPageState extends State<LoginPage> {
           }
         },
         child: SafeArea(
+          
           child: Padding(
             padding: EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.wb_sunny, size: 80, color: Colors.orange),
-                SizedBox(height: 20),
-                Text('Solar Energy App', 
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.orange)),
+                Flexible(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20, bottom: 40),
+                      child: Image.asset(
+                        'assets/images/image_WhiteBG.png',
+                        fit: BoxFit.contain,
+                        height: 300,
+                      ),
+                    ),
+                  ),
                 SizedBox(height: 40),
-                
                 Form(
                   key: _formKey,
                   child: Column(
@@ -74,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: ElevatedButton(
                         onPressed: state is AuthLoading ? null : _handleLogin,
                         child: state is AuthLoading 
-                          ? CircularProgressIndicator(color: Colors.white)
+                          ? CircularProgressIndicator(color: Colors.red)
                           : Text('Login'),
                       ),
                     );

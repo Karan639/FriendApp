@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:simpleapp/blocs/authBloc/auth_bloc.dart';
 import 'package:simpleapp/blocs/authBloc/auth_bloc_events.dart';
@@ -14,11 +15,11 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int currentIndex = 0; // Start with Dashboard (index 0)
+  int currentIndex = 1; // Start with Dashboard (index 0)
   
   final List<Widget> pages = [
-    DashboardPage(),
     QueryPage(),
+    DashboardPage(),
     SettingsPage(),
   ];
 
@@ -26,9 +27,10 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Solar Energy App'),
-        backgroundColor: Colors.orange, // Changed to orange to match theme
-        foregroundColor: Colors.white,
+        title: Text('Oscillation Energy LLP', style: GoogleFonts.robotoSerif(fontWeight: FontWeight.bold,fontSize: 21)),
+        toolbarHeight: MediaQuery.of(context).size.height * 0.08,
+        backgroundColor: const Color.fromARGB(255, 76, 152, 79), // Changed to orange to match theme
+        foregroundColor: Colors.black,
         actions: [
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
@@ -39,7 +41,7 @@ class _MainPageState extends State<MainPage> {
                     child: Text(
                       state.user.username[0].toUpperCase(), // Fixed: using username
                       style: TextStyle(
-                        color: Colors.orange,
+                        color: Colors.green,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -88,18 +90,18 @@ class _MainPageState extends State<MainPage> {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 8),
             child: GNav(
-              rippleColor: Colors.orange.shade300,
-              hoverColor: Colors.orange.shade100,
+              rippleColor: Colors.green.shade300,
+              hoverColor: Colors.green.shade100,
               gap: 8,
-              activeColor: Colors.orange,
+              activeColor: Colors.green,
               iconSize: 24,
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               duration: Duration(milliseconds: 400),
-              tabBackgroundColor: Colors.orange.shade100,
+              tabBackgroundColor: Colors.green.shade100,
               color: Colors.black,
               tabs: [
-                GButton(icon: Icons.dashboard, text: 'Dashboard'),
                 GButton(icon: Icons.help_outline, text: 'Query'),
+                GButton(icon: Icons.speed, text: 'Dashboard'),
                 GButton(icon: Icons.settings, text: 'Settings'),
               ],
               selectedIndex: currentIndex,

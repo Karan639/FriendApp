@@ -36,10 +36,11 @@ class _QueryPageState extends State<QueryPage> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Queries'),
-        backgroundColor: Colors.green,
+        backgroundColor: const Color.fromARGB(255, 167, 223, 169),
+        toolbarHeight: 0,// remove extra space
         bottom: TabBar(
           controller: _tabController,
+          
           tabs: [
             Tab(text: 'Submit Query'),
             Tab(text: 'My Queries'),
@@ -78,10 +79,9 @@ class _QueryPageState extends State<QueryPage> with SingleTickerProviderStateMix
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Submit Query', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          SizedBox(height: 8),
+         
           Text('Have questions or need support? Send us your query and we\'ll get back to you.',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600])),
+            style: TextStyle(fontSize: 16, color: Colors.grey[700])),
           SizedBox(height: 24),
           
           Form(
@@ -89,7 +89,7 @@ class _QueryPageState extends State<QueryPage> with SingleTickerProviderStateMix
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Subject', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                Text('Subject', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                 SizedBox(height: 8),
                 TextFormField(
                   controller: _subjectController,
@@ -102,7 +102,7 @@ class _QueryPageState extends State<QueryPage> with SingleTickerProviderStateMix
                 ),
                 SizedBox(height: 20),
                 
-                Text('Description', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                Text('Description', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                 SizedBox(height: 8),
                 TextFormField(
                   controller: _descriptionController,

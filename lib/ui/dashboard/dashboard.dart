@@ -30,7 +30,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(color: Colors.orange),
+                    CircularProgressIndicator(color: Colors.green),
                     SizedBox(height: 16),
                     Text('Loading energy data...'),
                   ],
@@ -42,16 +42,16 @@ class _DashboardPageState extends State<DashboardPage> {
                 physics: AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      'Today\'s Energy Overview',
-                      style: TextStyle(
-                        fontSize: 24, 
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 20),
+                    // Text(
+                    //   'Today\'s Energy Overview',
+                    //   style: TextStyle(
+                    //     fontSize: 24, 
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
+                    // SizedBox(height: 20),
                     
                     // Daily Energy Generation - Bold Section
                     Card(
@@ -62,7 +62,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           gradient: LinearGradient(
-                            colors: [Colors.orange.shade400, Colors.orange.shade600],
+                            colors: [Colors.green.shade400, Colors.green.shade600],
                           ),
                         ),
                         child: Column(
@@ -113,7 +113,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                         _buildMetricCard(
                           'Daily Savings', 
-                          '\$${data.dailyEnergySavings.toStringAsFixed(2)}', 
+                          '\u{20B9}${data.dailyEnergySavings.toStringAsFixed(2)}', 
                           Icons.savings, 
                           Colors.green,
                         ),
@@ -125,7 +125,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                         _buildMetricCard(
                           'Total Earnings', 
-                          '\$${data.earnings.toStringAsFixed(2)}', 
+                          '\u{20B9}${data.earnings.toStringAsFixed(2)}', 
                           Icons.monetization_on, 
                           Colors.teal,
                         ),
@@ -212,14 +212,14 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 28, color: color),
+            Icon(icon, size: 35, color: color),
             SizedBox(height: 8),
             Text(
               title,
               style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -229,7 +229,7 @@ class _DashboardPageState extends State<DashboardPage> {
             Text(
               value,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 17,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simpleapp/blocs/QueryBloc/query_bloc.dart';
 import 'package:simpleapp/blocs/authBloc/auth_bloc.dart';
@@ -46,24 +47,25 @@ class MyApp extends StatelessWidget {
         BlocProvider<QueryBloc>(create: (_) => getIt<QueryBloc>()),
       ],
       child: MaterialApp(
-        title: 'Solar Energy App',
+        title: 'Oscillation Energy LLP',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.orange,
+          scaffoldBackgroundColor: Color.fromARGB(255, 255, 255, 255),
+          primarySwatch:  Colors.green,
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              foregroundColor: Colors.white,
+              backgroundColor: const Color.fromARGB(255, 76, 152, 79),
+              foregroundColor: const Color.fromARGB(255, 236, 235, 235),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
           ),
-          appBarTheme: AppBarTheme(
-            backgroundColor: Colors.orange,
-            foregroundColor: Colors.white,
-            elevation: 0,
-          ),
+          // appBarTheme: AppBarTheme(
+          //   backgroundColor: const Color.fromARGB(255, 84, 215, 99),
+          //   foregroundColor: Colors.white,
+          //   elevation: 0,
+          // ),
         ),
         home: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
@@ -74,7 +76,7 @@ class MyApp extends StatelessWidget {
             // } else {
             //   return LoginPage();
             // }
-            return SplashPage();
+            return MainPage();
           },
         ),
       ),
